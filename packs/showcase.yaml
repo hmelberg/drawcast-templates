@@ -1,0 +1,156 @@
+pack: showcase
+title: Showcase
+description: Two small demo templates — a Venn diagram and a number line.
+---
+template: venn_diagram
+title: Venn diagram
+version: 1
+kit: 1
+status: ready
+description: >-
+  A two-set Venn diagram: two overlapping circles, with each circle's
+  unique members and the shared members shown as plain text inside their
+  region, plus a name label under each circle. Choose this scene for
+  requests about sets, overlapping categories, "what do X and Y have in
+  common", intersections, or unions of two groups.
+params:
+  type: object
+  properties:
+    label_a:
+      type: string
+      description: "Left circle's name (default 'A')."
+    label_b:
+      type: string
+      description: "Right circle's name (default 'B')."
+    sets:
+      type: object
+      description: "Which items go in each region."
+      properties:
+        a:
+          type: array
+          items: { type: string }
+          description: "Items only in the left set."
+        b:
+          type: array
+          items: { type: string }
+          description: "Items only in the right set."
+        both:
+          type: array
+          items: { type: string }
+          description: "Items in both sets (the overlap)."
+element_ids:
+  circle_a_fill / circle_b_fill: the two circles' translucent fills
+  circle_a / circle_b: the two circle outlines
+  region_a / region_b / region_both: the exact-position item lists in each region
+  label_a / label_b: the circle name labels, below each circle
+examples:
+  - request: "Draw a Venn diagram comparing mammals and birds."
+    params:
+      label_a: Mammals
+      label_b: Birds
+      sets:
+        a: [Fur, Live birth]
+        b: [Feathers, Beak]
+        both: [Warm-blooded]
+  - request: "Show a Venn diagram of even numbers and multiples of 3, up to 12."
+    params:
+      label_a: Even
+      label_b: "Multiple of 3"
+      sets:
+        a: [2, 4, 8, 10]
+        b: [3, 9]
+        both: [6, 12]
+layout: |
+  const C = kit.COLORS, MS = kit.SKETCH_MS;
+  const labelA = params.label_a ?? "A";
+  const labelB = params.label_b ?? "B";
+  const sets = params.sets ?? {};
+  const join = (arr) => Array.isArray(arr) ? arr.map(String).join(", ") : "";
+  const cy = 375, r = 210, cxA = 380, cxB = 620;
+  const drawables = [], labels = [], anchors = {}, order = [];
+  const push = (d) => { drawables.push(d); order.push(d.id); };
+  push(kit.area("circle_a_fill", kit.ellipse([cxA, cy], r, r), C.region1, { opacity: 0.3 }));
+  push(kit.area("circle_b_fill", kit.ellipse([cxB, cy], r, r), C.region2, { opacity: 0.3 }));
+  push(kit.stroke("circle_a", kit.ellipse([cxA, cy], r, r), { closed: true, color: C.supply, strokeWidth: 4, ms: MS.curve }));
+  push(kit.stroke("circle_b", kit.ellipse([cxB, cy], r, r), { closed: true, color: C.demand, strokeWidth: 4, ms: MS.curve }));
+  push(kit.text("region_a", [cxA - 110, cy], join(sets.a), { fontSize: 20 }));
+  push(kit.text("region_b", [cxB + 110, cy], join(sets.b), { fontSize: 20 }));
+  push(kit.text("region_both", [(cxA + cxB) / 2, cy], join(sets.both), { fontSize: 20, color: C.accent }));
+  anchors.circle_a = [cxA, cy - r];
+  anchors.circle_b = [cxB, cy - r];
+  labels.push(kit.label("label_a", [cxA, cy - r], "below", labelA, { color: C.supply, fontSize: 26 }));
+  order.push("label_a");
+  labels.push(kit.label("label_b", [cxB, cy - r], "below", labelB, { color: C.demand, fontSize: 26 }));
+  order.push("label_b");
+  return { drawables, labels, anchors, order };
+---
+template: number_line
+title: Number line
+version: 1
+kit: 1
+status: ready
+description: >-
+  A horizontal number line: an arrowed axis, evenly spaced tick marks with
+  their numeric values from min to max, and optional accent dots marking
+  specific highlighted values. Choose this scene for requests about number
+  lines, counting, integers, inequalities plotted on a line, or "mark these
+  values on a number line".
+params:
+  type: object
+  properties:
+    min:
+      type: number
+      description: "Left end value (default 0)."
+    max:
+      type: number
+      description: "Right end value (default 10)."
+    step:
+      type: number
+      description: "Spacing between tick marks (default 1). At most 40 ticks are drawn — a smaller step is coarsened to fit."
+    highlight:
+      type: array
+      items: { type: number }
+      description: "Values to mark with an accent dot (need not fall on a tick)."
+element_ids:
+  axis: the horizontal line with arrowheads at both ends
+  ticks: the group of tick marks
+  tick_labels: the group of tick numbers, below the axis
+  highlights: the group of accent dots marking highlighted values (present only when highlight is given)
+examples:
+  - request: "Draw a number line from 0 to 10."
+    params: { min: 0, max: 10, step: 1 }
+  - request: "Show a number line from -5 to 5 with -2 and 3 highlighted."
+    params: { min: -5, max: 5, step: 1, highlight: [-2, 3] }
+layout: |
+  const min = params.min ?? 0;
+  const max = params.max ?? 10;
+  const rawStep = Math.abs(params.step ?? 1) || 1;
+  const span = (max - min) || 1;
+  let count = Math.round(span / rawStep);
+  if (!Number.isFinite(count) || count < 1) count = 10;
+  count = Math.min(count, 40);
+  const step = span / count;
+  const highlight = Array.isArray(params.highlight) ? params.highlight : [];
+  const C = kit.COLORS, MS = kit.SKETCH_MS;
+  const x0 = 100, x1 = 900, y = 375;
+  const scale = (v) => x0 + ((v - min) / span) * (x1 - x0);
+  const fmt = (v) => String(Math.round(v * 1000) / 1000);
+  const drawables = [], labels = [], anchors = {}, order = [];
+  const push = (d) => { drawables.push(d); order.push(d.id); };
+  push(kit.stroke("axis", [[x0 - 25, y], [x1 + 25, y]], { arrowhead: "both", strokeWidth: 3, color: C.guide, ms: MS.axis }));
+  const tickMarks = [], tickNums = [];
+  for (let i = 0; i <= count; i++) {
+    const v = min + i * step;
+    const x = scale(v);
+    tickMarks.push(kit.stroke("tick_" + i, [[x, y - 10], [x, y + 10]], { strokeWidth: 2.5, ms: MS.dot }));
+    tickNums.push(kit.text("num_" + i, [x, y - 32], fmt(v), { fontSize: 20 }));
+  }
+  push(kit.group("ticks", tickMarks));
+  push(kit.group("tick_labels", tickNums));
+  anchors.axis = [x0, y];
+  const highlightDots = highlight.map((v, k) => {
+    const x = scale(v);
+    return kit.stroke("highlight_" + k, [[x, y]], { shapeHint: { type: "circle", c: [x, y], r: 9 }, fill: C.accent, color: C.accent, strokeWidth: 2, ms: MS.dot });
+  });
+  if (highlightDots.length > 0) push(kit.group("highlights", highlightDots));
+  return { drawables, labels, anchors, order };
