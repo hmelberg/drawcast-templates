@@ -235,7 +235,7 @@ element_ids:
   floor: the floor the blocks stand on (present unless floor is false)
   block_<i>: "block i (in the order given), a group of its visible faces"
   block_<i>_name: "block i's name, on its top face — or just above the block when the top face is too small or covered, or placed by the label solver (with a leader) when the block is hidden behind a taller one"
-  links: "SET — every link arrow in one id"
+  links: "SET — every link arrow; naming it stands for all of them, and each keeps its own link_<k> id"
   link_<k>: "the k-th link arrow that could be drawn (a link between blocks that touch or overlap on screen is skipped)"
   title: the title, when set
 examples:
@@ -414,7 +414,9 @@ layout: |
       arrowhead: ln.both_ways ? "both" : "end", color: C.demand, strokeWidth: 3.5, ms: MS.arrow,
     }));
   });
-  if (linkKids.length > 0) push(kit.group("links", linkKids));
+  // Each arrow is its own element; `links` names the set (SceneLayout.groups).
+  linkKids.forEach(push);
+  const groups = linkKids.length > 0 ? { links: linkKids.map((d) => d.id) } : {};
 
   // ---- names: on the top face when it fits, else just above the block ----
   // A spot must pass the lint's own test (no stroke crosses the middle of
@@ -487,7 +489,7 @@ layout: |
   }
 
   if (hasTitle) push(kit.text("title", [500, 712], params.title, { fontSize: 30 }));
-  return { drawables, labels, anchors, order };
+  return { drawables, labels, anchors, order, groups };
 ---
 template: geometric_solids
 title: Textbook 3D solid with dimensions
