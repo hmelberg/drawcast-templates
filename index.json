@@ -4,5 +4,11 @@
     "title": "Showcase",
     "description": "Two small demo templates — a Venn diagram and a number line.",
     "url": "https://raw.githubusercontent.com/hmelberg/drawcast-templates/main/packs/showcase.yaml"
+  },
+  {
+    "id": "isometric",
+    "title": "2.5D & isometric",
+    "description": "Isometric layer stacks, block diagrams on a floor, and textbook 3D solids with dimensions — flat drawings that read as depth.",
+    "url": "https://raw.githubusercontent.com/hmelberg/drawcast-templates/main/packs/isometric.yaml"
   }
 ]
