@@ -70,6 +70,24 @@ examples:
         - { name: Epidermis, note: "outer, waterproof" }
         - { name: Dermis, note: "nerves, hair roots" }
         - { name: Hypodermis, note: "fat, insulation" }
+  - request: "Show the TCP/IP model and highlight the transport layer."
+    params:
+      title: The TCP/IP model
+      highlight: Transport
+      layers:
+        - { name: Application, note: "HTTP, DNS, SSH" }
+        - { name: Transport, note: "TCP, UDP" }
+        - { name: Internet, note: "IPv4, IPv6, ICMP" }
+        - { name: Link, note: "Ethernet, Wi-Fi" }
+  - request: "Draw the layers of the atmosphere."
+    params:
+      title: Layers of the atmosphere
+      layers:
+        - { name: Exosphere, note: "700 km and up" }
+        - { name: Thermosphere, note: "80–700 km" }
+        - { name: Mesosphere, note: "50–80 km" }
+        - { name: Stratosphere, note: "12–50 km, ozone" }
+        - { name: Troposphere, note: "0–12 km, weather" }
 layout: |
   // 2.5D via kit.project3d: one box3 per slab, one project3d call per slab,
   // called bottom-up so each slab paints over the one below it (the painter's
@@ -246,6 +264,29 @@ examples:
         - { from: Receiving, to: Racks }
         - { from: Racks, to: Packing }
         - { from: Packing, to: Shipping }
+  - request: "Draw a small office network in isometric: internet, firewall, switch, two servers and a NAS."
+    params:
+      title: Office network
+      blocks:
+        - { name: Internet, at: [0, 0], size: [1, 1, 0.5], color: grey }
+        - { name: Firewall, at: [3, 0], size: [1, 1, 0.8], color: red }
+        - { name: Switch, at: [3, 3], size: [1, 1, 0.4], color: yellow }
+        - { name: Web, at: [6, 1], size: [1, 1, 1.4], color: blue }
+        - { name: Mail, at: [6, 4], size: [1, 1, 1.4], color: blue }
+        - { name: NAS, at: [1, 6], size: [1, 1, 0.9], color: green }
+      links:
+        - { from: Internet, to: Firewall, both_ways: true }
+        - { from: Firewall, to: Switch }
+        - { from: Switch, to: Web }
+        - { from: Switch, to: Mail }
+        - { from: Switch, to: NAS }
+  - request: "Sketch a small campus plan: library, lecture hall, lab building and cafeteria."
+    params:
+      blocks:
+        - { name: Library, at: [0, 0], size: [2, 2, 1.6], color: purple }
+        - { name: Lectures, at: [4, 0], size: [2, 1, 1.0], color: blue }
+        - { name: Labs, at: [0, 4], size: [2, 1, 1.2], color: green }
+        - { name: Cafe, at: [4, 3], size: [1, 1, 0.5], color: orange }
 layout: |
   const C = kit.COLORS, MS = kit.SKETCH_MS;
   const COLOR = { blue: C.supply, green: C.region2, yellow: C.region1, orange: C.shifted, purple: C.accent, red: C.demand, grey: C.guide };
@@ -517,6 +558,10 @@ examples:
     params: { solid: square_pyramid, dims: { side: 6, height: 5 }, unit: m }
   - request: "Show a triangular prism: triangle base 4, triangle height 3, length 7."
     params: { solid: triangular_prism, dims: { base: 4, height: 3, length: 7 } }
+  - request: "Draw a cube with side length 5 cm."
+    params: { solid: cube, dims: { side: 5 }, unit: cm }
+  - request: "Show a sphere of radius r."
+    params: { solid: sphere, labels: { radius: r }, title: "Sphere: V = 4⁄3πr³" }
 layout: |
   const C = kit.COLORS, MS = kit.SKETCH_MS;
   const SOLIDS = ["cube", "cuboid", "triangular_prism", "square_pyramid", "cylinder", "cone", "sphere"];
